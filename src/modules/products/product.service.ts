@@ -23,9 +23,6 @@ export class ProductService {
     return this.products;
   }
 
-  // createProduct(): string {
-  //   return 'POST  PRODUCTS';
-  // }
   createProduct(productDto: ProductDto): Product {
     const product: Product = {
       id: Math.random(),
@@ -39,8 +36,13 @@ export class ProductService {
     return this.products.find((item) => item.id === Number(id));
   }
 
-  updateProduct(): string {
-    return 'UPDATE PRODUCTS';
+  updateProduct(productDto: ProductDto, id: number): Product {
+    const index = this.products.findIndex((item) => item.id === Number(id));
+    this.products[index].categoryId = productDto.categoryId;
+    this.products[index].productName = productDto.productName;
+    this.products[index].price = productDto.price;
+
+    return this.products[index];
   }
 
   deleteProduct(): string {

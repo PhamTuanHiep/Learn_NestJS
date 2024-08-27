@@ -5,6 +5,6 @@ export class ProductDto {
   categoryId?: number;
   @MinLength(5, { message: 'This field must be than 5 character Nine Dev !' })
   productName?: string;
-  // @IsNumber()
+  @IsNumber()
   price?: number;
 }

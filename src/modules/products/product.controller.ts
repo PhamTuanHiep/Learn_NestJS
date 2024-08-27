@@ -35,7 +35,9 @@ export class ProductControllers {
     }
   }
   @Post()
-  createProduct(@Body() productDto: ProductDto): ResponseData<ProductDto> {
+  createProduct(
+    @Body(new ValidationPipe()) productDto: ProductDto,
+  ): ResponseData<ProductDto> {
     try {
       return new ResponseData<ProductDto>(
         productDto,

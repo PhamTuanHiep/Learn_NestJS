@@ -34,24 +34,26 @@ export class ProductControllers {
       );
     }
   }
+
   @Post()
   createProduct(
     @Body(new ValidationPipe()) productDto: ProductDto,
   ): ResponseData<ProductDto> {
     try {
-      return new ResponseData<ProductDto>(
-        productDto,
+      return new ResponseData<Product>(
+        this.productService.createProduct(productDto),
         HttpStatus.SUCCESS,
         HttpMessage.SUCCESS,
       );
     } catch (e) {
-      return new ResponseData<ProductDto>(
+      return new ResponseData<Product>(
         null,
         HttpStatus.ERROR,
         HttpMessage.ERROR,
       );
     }
   }
+
   @Get('/:id')
   detailProduct(@Param('id') id: number): ResponseData<Product> {
     try {
@@ -85,6 +87,7 @@ export class ProductControllers {
       );
     }
   }
+
   @Delete('/:id')
   deleteProduct(): ResponseData<string> {
     try {

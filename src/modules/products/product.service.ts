@@ -1,57 +1,41 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { ProductDto } from 'src/dto/product.dto';
+import { ProductEntity } from 'src/enities/product.entity';
 import { Product } from 'src/models/product.model';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProductService {
-  private products: Product[] = [
-    {
-      id: 1,
-      categoryId: 2,
-      productName: 'Nine Dev',
-      price: 80000,
-    },
-    {
-      id: 2,
-      categoryId: 2,
-      productName: 'Seven Dev',
-      price: 80000,
-    },
-  ];
+  constructor(
+    @InjectRepository(ProductEntity)
+    private productRepository: Repository<ProductEntity>,
+  ) {}
 
-  getProducts(): Product[] {
-    return this.products;
+  async findAll() {
+    return await this.productRepository.find();
   }
 
-  createProduct(productDto: ProductDto): Product {
-    const product: Product = {
-      id: Math.random(),
+  async findOne(id: number): Promise<Product | null> {
+    return await this.productRepository.findOne({ where: { id } });
+  }
+
+  async createProduct(productDto: ProductDto) {
+    const product = this.productRepository.create(productDto);
+    return await this.productRepository.save(product);
+  }
+
+  async update(id: number, productDto: ProductDto) {
+    const product = await this.productRepository.findOne({ where: { id } });
+    const productUpdate = {
+      ...product,
       ...productDto,
     };
-    this.products.push(product);
-    return product;
+    return await this.productRepository.save(productUpdate);
   }
 
-  detailProduct(id: number): Product {
-    return this.products.find((item) => item.id === Number(id));
-  }
-
-  updateProduct(productDto: ProductDto, id: number): Product {
-    const index = this.products.findIndex((item) => item.id === Number(id));
-    this.products[index].categoryId = productDto.categoryId;
-    this.products[index].productName = productDto.productName;
-    this.products[index].price = productDto.price;
-
-    return this.products[index];
-  }
-
-  deleteProduct(id: number): boolean {
-    const index = this.products.findIndex((item) => item.id === Number(id));
-    console.log('id:', id);
-    if (index !== -1) {
-      this.products.splice(index, 1);
-      return true;
-    }
-    return false;
+  async delete(id: number) {
+    const product = await this.productRepository.findOne({ where: { id } });
+    return await this.productRepository.remove(product);
   }
 }

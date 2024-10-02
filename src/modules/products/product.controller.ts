@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   ValidationPipe,
@@ -19,34 +20,15 @@ export class ProductControllers {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  getProducts(): ResponseData<Product[]> {
+  async findAll(): Promise<ResponseData<Product[]>> {
     try {
       return new ResponseData<Product[]>(
-        this.productService.getProducts(),
+        await this.productService.findAll(),
         HttpStatus.SUCCESS,
         HttpMessage.SUCCESS,
       );
     } catch (e) {
       return new ResponseData<Product[]>(
-        null,
-        HttpStatus.ERROR,
-        HttpMessage.ERROR,
-      );
-    }
-  }
-
-  @Post()
-  createProduct(
-    @Body(new ValidationPipe()) productDto: ProductDto,
-  ): ResponseData<ProductDto> {
-    try {
-      return new ResponseData<Product>(
-        this.productService.createProduct(productDto),
-        HttpStatus.SUCCESS,
-        HttpMessage.SUCCESS,
-      );
-    } catch (e) {
-      return new ResponseData<Product>(
         null,
         HttpStatus.ERROR,
         HttpMessage.ERROR,
@@ -55,10 +37,31 @@ export class ProductControllers {
   }
 
   @Get('/:id')
-  detailProduct(@Param('id') id: number): ResponseData<Product> {
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ResponseData<Product>> {
     try {
       return new ResponseData<Product>(
-        this.productService.detailProduct(id),
+        await this.productService.findOne(id),
+        HttpStatus.SUCCESS,
+        HttpMessage.SUCCESS,
+      );
+    } catch (e) {
+      return new ResponseData<Product>(
+        null,
+        HttpStatus.ERROR,
+        HttpMessage.ERROR,
+      );
+    }
+  }
+
+  @Post()
+  async createProduct(
+    @Body(new ValidationPipe()) productDto: ProductDto,
+  ): Promise<ResponseData<ProductDto>> {
+    try {
+      return new ResponseData<Product>(
+        await this.productService.createProduct(productDto),
         HttpStatus.SUCCESS,
         HttpMessage.SUCCESS,
       );
@@ -72,13 +75,13 @@ export class ProductControllers {
   }
 
   @Put('/:id')
-  updateProduct(
-    @Body() productDto: ProductDto,
-    @Param('id') id: number,
-  ): ResponseData<Product> {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ValidationPipe()) productDto: ProductDto,
+  ): Promise<ResponseData<Product>> {
     try {
       return new ResponseData<Product>(
-        this.productService.updateProduct(productDto, id),
+        await this.productService.update(id, productDto),
         HttpStatus.SUCCESS,
         HttpMessage.SUCCESS,
       );
@@ -92,16 +95,18 @@ export class ProductControllers {
   }
 
   @Delete('/:id')
-  deleteProduct(@Param('id') id: number): ResponseData<boolean> {
+  async delete(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ResponseData<boolean>> {
     try {
       return new ResponseData<boolean>(
-        this.productService.deleteProduct(id),
+        (await this.productService.delete(id)) ? true : false,
         HttpStatus.SUCCESS,
         HttpMessage.SUCCESS,
       );
     } catch (e) {
       return new ResponseData<boolean>(
-        null,
+        false,
         HttpStatus.ERROR,
         HttpMessage.ERROR,
       );
